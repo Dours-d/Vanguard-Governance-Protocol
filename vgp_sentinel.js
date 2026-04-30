@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-// VGP SENTINEL - UNIVERSAL CORE v1.1
+// VGP SENTINEL - UNIVERSAL CORE v1.1.1 (Node v12 Compatible)
 // Usage: node vgp_sentinel.js [PROJECT_ROOT_PATH]
 
 const ROOT_DIR = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
@@ -58,6 +58,12 @@ function updateRecoveryPrompt() {
     
     const version = config.version || 'v0.0.0';
 
+    let progress = "See spec for details.";
+    const progressSplit = spec.split('### Progress');
+    if (progressSplit.length > 1) {
+        progress = progressSplit[1].split('---')[0].trim();
+    }
+
     currentPrompt = `
 # VGP RECOVERY PROMPT - ${config.project_name} (${version})
 # TIMESTAMP: ${new Date().toISOString()}
@@ -69,7 +75,7 @@ Maintain the ${version} stable core.
 ${auditStatus}
 
 ## RECENT PROGRESS:
-${spec.split('### Progress')[1]?.split('---')[0]?.trim() || "See spec for details."}
+${progress}
 
 ## CORE CONSTRAINTS (VGP ENFORCED):
 1. Root-First Architecture.
