@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-// VGP SENTINEL - UNIVERSAL CORE v1.1.1 (Node v12 Compatible)
+// VGP SENTINEL - UNIVERSAL CORE v1.2.0 (Node v12 Compatible)
 // Usage: node vgp_sentinel.js [PROJECT_ROOT_PATH]
 
 const ROOT_DIR = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
@@ -33,14 +33,29 @@ function performGovernanceAudit() {
     const contents = fs.readdirSync(ROOT_DIR, { withFileTypes: true });
     const unjustified = [];
 
+    // LOAD .vgpignore if exists
+    const ignorePath = path.join(ROOT_DIR, '.vgpignore');
+    let ignored = [];
+    if (fs.existsSync(ignorePath)) {
+        ignored = fs.readFileSync(ignorePath, 'utf8')
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line && !line.startsWith('#'));
+    }
+
     contents.forEach(item => {
-        if (item.isDirectory() && !config.governance.allowed_subdirs.includes(item.name)) {
-            unjustified.push(item.name);
+        if (item.isDirectory()) {
+            const isAllowed = config.governance.allowed_subdirs.includes(item.name);
+            const isIgnored = ignored.includes(item.name);
+            
+            if (!isAllowed && !isIgnored) {
+                unjustified.push(item.name);
+            }
         }
     });
 
     if (unjustified.length > 0) {
-        return `WARNING: Unjustified directories identified in ${config.project_name}: ${unjustified.join(', ')}. Immediate purge required per VGP Policy.`;
+        return `WARNING: Unjustified directories identified in ${config.project_name}: ${unjustified.join(', ')}. Immediate purge required per VGP Policy (or add to .vgpignore).`;
     }
     return "GOVERNANCE STATUS: ARCHITECTURAL INTEGRITY VERIFIED.";
 }
