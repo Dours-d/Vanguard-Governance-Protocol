@@ -11,6 +11,7 @@ The Vanguard Governance Protocol (VGP) is a standardized framework for maintaini
 ## 🚀 Usage with Antigravity
 
 ### 1. Project Initialization
+
 Add a `vgp.config.json` to your project root. Use the `vgp.config.template.json` as a starting point.
 
 ```json
@@ -30,6 +31,7 @@ Add a `vgp.config.json` to your project root. Use the `vgp.config.template.json`
 ```
 
 ### 2. Launching the Ecosystem
+
 Place `vgp_sentinel.js` and `start-antigravity-cdp-9000.sh` in a central location (e.g., your Desktop). Navigate to your project directory in the terminal and run:
 
 ```bash
@@ -37,17 +39,21 @@ sh ~/Desktop/start-antigravity-cdp-9000.sh
 ```
 
 The script will:
+
 1. Start the Antigravity server on port 9000.
 2. Setup the CDP TCP proxy.
 3. Detect the `vgp.config.json` and launch the Sentinel.
 4. Deliver a project-specific recovery prompt to the Desktop every 10 minutes.
 
 ## 🛡️ Governance Policy
+
 The VGP Sentinel enforces the following:
+
 - **Root-First Deployment**: Prevents version drift by ensuring core production artifacts remain at the repository root.
 - **Thematic Integrity**: Ensures that artifact sorting follows "Human Research Logic" (Thematic grouping before alphabetical title fallback).
 - **Audit Logging**: Intercepts and logs "unjustified" subdirectories created during AI development.
 - **Exclusion Protocol (.vgpignore)**: Justified research or development paths must be recorded here. **IMPORTANT: This file is restricted from AI Agent usage. Only the human USER may authorize exclusions to maintain true architectural oversight.**
 
----
+## Protocol Credits
+
 **Protocol by Antigravity AI | Gaza Resiliency Field**
