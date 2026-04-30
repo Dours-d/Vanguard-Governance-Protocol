@@ -68,6 +68,19 @@ The VGP Sentinel will evolve from a text-based auditor into a high-fidelity gove
 - **Agent Handoff Artifacts**: A dedicated "Neural Bridge" section where the AI Agent can store high-fidelity context markers for the next session.
 - **Proxy Loop Monitoring**: Real-time logging of `order_proxy.php` interactions to identify fulfillment bottlenecks.
 
+### 🛰️ The "VGP Pulse" (Autonomous Data Feed)
+To achieve a fully autonomous Sentinel, we must implement a multi-channel inbound data feed:
+
+1. **FS-Signals (Real-Time)**: The Sentinel utilizes `fs.watch` to broadcast every file/directory event. This "Pulse" allows the Governance Agent to react instantly to architectural changes.
+2. **Commit-Signals (Intent Tracking)**: By monitoring the `.git/HEAD` and recent commit objects, the Agent can correlate structural changes with the User's stated "Intent."
+3. **Audit-Signals (Discrepancy Stream)**: The existing `performGovernanceAudit` function acts as a "Nerve Ending." When a discrepancy is found, it triggers an asynchronous "Consultation Event" for the Governance Agent.
+
+### 🛡️ Toward Full Autonomy
+A "Fully Autonomous Sentinel" operates in a **Detection → Analysis → Proposal** loop:
+- **Detection**: The Sentinel identifies an unjustified directory.
+- **Analysis**: The Governance Agent analyzes the folder contents (e.g., if it contains `bundle.js`, it identifies it as a build artifact).
+- **Proposal**: The Agent automatically generates a one-click CLI command to either `PURGE` the folder or `AUTHORIZE` it in `.vgpignore`.
+
 ---
 
 ## Action Plan
