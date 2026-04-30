@@ -1,0 +1,19 @@
+{
+  "project_name": "War Lego AI Merch Shop",
+  "version": "v2.4.0",
+  "governance": {
+    "root_first": true,
+    "allowed_subdirs": ["production_ready", "legal", ".git", "node_modules"],
+    "spec_file": "shop_specification.md"
+  },
+  "automation": {
+    "prompt_sync_interval_ms": 600000,
+    "recovery_paths": [
+      "./recovery_prompt.txt",
+      "/home/abd/Desktop/recovery prompts/automatic_recovery_prompt.txt"
+    ]
+  },
+  "network": {
+    "port": 3000
+  }
+}
