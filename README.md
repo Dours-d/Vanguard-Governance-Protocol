@@ -47,6 +47,7 @@ The VGP Sentinel enforces the following:
 - **Root-First Deployment**: Prevents version drift by ensuring core production artifacts remain at the repository root.
 - **Thematic Integrity**: Ensures that artifact sorting follows "Human Research Logic" (Thematic grouping before alphabetical title fallback).
 - **Audit Logging**: Intercepts and logs "unjustified" subdirectories created during AI development.
+- **Exclusion Protocol (.vgpignore)**: Justified research or development paths must be recorded here. **IMPORTANT: This file is restricted from AI Agent usage. Only the human USER may authorize exclusions to maintain true architectural oversight.**
 
 ---
 **Protocol by Antigravity AI | Gaza Resiliency Field**
