@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-// VGP SENTINEL - UNIVERSAL CORE v1.3.0 (VGP Pulse Enabled)
+// VGP SENTINEL - UNIVERSAL CORE v1.3.1 (Auto-Purge & Pulse Enabled)
 // Node v12 Compatible
 // Usage: node vgp_sentinel.js [PROJECT_ROOT_PATH]
 
@@ -39,10 +39,26 @@ function logSignal(type, details) {
 }
 
 // 1. FS-Signals Broadcaster (Pulse Layer)
+let purgeDebounceTimer = null;
+const { exec } = require('child_process');
+
 try {
     fs.watch(ROOT_DIR, { recursive: true }, (eventType, filename) => {
         if (filename && !filename.includes('.git') && !filename.includes('node_modules')) {
             logSignal('FS_EVENT', `${eventType.toUpperCase()} detected on ${filename}`);
+
+            // AUTOMATED CACHE PURGE RULE
+            const coreFiles = ['index.html', 'index.css', 'app.js', 'catalog.json', 'hubs.json'];
+            if (coreFiles.some(f => filename.endsWith(f))) {
+                if (purgeDebounceTimer) clearTimeout(purgeDebounceTimer);
+                purgeDebounceTimer = setTimeout(() => {
+                    logSignal('GOVERNANCE_ACTION', `Triggering Cloudflare Purge for ${filename}...`);
+                    exec('sh purge_cache.sh', { cwd: ROOT_DIR }, (err, stdout, stderr) => {
+                        if (err) logSignal('ACTION_ERROR', `Purge failed: ${err.message}`);
+                        else logSignal('ACTION_SUCCESS', `Cloudflare Purge Complete.`);
+                    });
+                }, 2000); // 2-second debounce
+            }
         }
     });
     console.log(`[VGP PULSE] FS_WATCH ACTIVE ON ${ROOT_DIR}`);
