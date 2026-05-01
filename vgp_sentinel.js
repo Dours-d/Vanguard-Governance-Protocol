@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-// VGP SENTINEL - UNIVERSAL CORE v1.2.0 (Node v12 Compatible)
+// VGP SENTINEL - UNIVERSAL CORE v1.3.0 (VGP Pulse Enabled)
+// Node v12 Compatible
 // Usage: node vgp_sentinel.js [PROJECT_ROOT_PATH]
 
 const ROOT_DIR = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
@@ -18,15 +19,36 @@ const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
 // DYNAMIC CONFIGURATION
 const SPEC_FILE = path.join(ROOT_DIR, config.governance.spec_file);
 const PORT = config.network.port || 3000;
-const RECOVERY_PATHS = config.automation.recovery_paths.map(p => p.replace(/^~/, process.env.HOME));
-
-// PROJECT-SPECIFIC DESKTOP NAMING
-const SAFE_PROJECT_NAME = config.project_name.toLowerCase().replace(/\s+/g, '_');
 const DESKTOP_DIR = '/home/abd/Desktop/recovery prompts';
+const SAFE_PROJECT_NAME = config.project_name.toLowerCase().replace(/\s+/g, '_');
 const AUTOMATIC_DESKTOP_PROMPT = path.join(DESKTOP_DIR, `${SAFE_PROJECT_NAME}_automatic_recovery_prompt.txt`);
 
 let lastReportUpdate = new Date();
 let currentPrompt = "INIT: Awaiting first audit cycle...";
+let signalPulse = []; // Inbound signal buffer for VGP Pulse
+
+function logSignal(type, details) {
+    const signal = {
+        timestamp: new Date().toISOString(),
+        type: type,
+        details: details
+    };
+    signalPulse.unshift(signal);
+    if (signalPulse.length > 50) signalPulse.pop();
+    console.log(`[VGP PULSE] ${type}: ${details}`);
+}
+
+// 1. FS-Signals Broadcaster (Pulse Layer)
+try {
+    fs.watch(ROOT_DIR, { recursive: true }, (eventType, filename) => {
+        if (filename && !filename.includes('.git') && !filename.includes('node_modules')) {
+            logSignal('FS_EVENT', `${eventType.toUpperCase()} detected on ${filename}`);
+        }
+    });
+    console.log(`[VGP PULSE] FS_WATCH ACTIVE ON ${ROOT_DIR}`);
+} catch (e) {
+    console.warn(`[VGP PULSE] FS_WATCH WARNING: Recursive watch might not be supported on this OS. ${e.message}`);
+}
 
 function performGovernanceAudit() {
     console.log(`[${new Date().toISOString()}] VGP AUDIT STARTING FOR ${config.project_name}...`);
@@ -55,6 +77,7 @@ function performGovernanceAudit() {
     });
 
     if (unjustified.length > 0) {
+        logSignal('GOVERNANCE_ALARM', `Unjustified directories: ${unjustified.join(', ')}`);
         return `WARNING: Unjustified directories identified in ${config.project_name}: ${unjustified.join(', ')}. Immediate purge required per VGP Policy (or add to .vgpignore).`;
     }
     return "GOVERNANCE STATUS: ARCHITECTURAL INTEGRITY VERIFIED.";
@@ -72,7 +95,6 @@ function updateRecoveryPrompt() {
     }
     
     const version = config.version || 'v0.0.0';
-
     let progress = "See spec for details.";
     const progressSplit = spec.split('### Progress');
     if (progressSplit.length > 1) {
@@ -101,7 +123,6 @@ ${progress}
     // 1. Write to Project-Local Recovery Prompt
     try {
         fs.writeFileSync(path.join(ROOT_DIR, 'recovery_prompt.txt'), currentPrompt);
-        console.log(`[VGP LOCAL SYNC] Prompt updated at ${path.join(ROOT_DIR, 'recovery_prompt.txt')}`);
     } catch (e) {
         console.error(`[VGP LOCAL SYNC FAILED] ${e.message}`);
     }
@@ -110,7 +131,6 @@ ${progress}
     try {
         if (!fs.existsSync(DESKTOP_DIR)) fs.mkdirSync(DESKTOP_DIR, { recursive: true });
         fs.writeFileSync(AUTOMATIC_DESKTOP_PROMPT, currentPrompt);
-        console.log(`[VGP DESKTOP SYNC] Prompt updated at ${AUTOMATIC_DESKTOP_PROMPT}`);
     } catch (e) {
         console.error(`[VGP DESKTOP SYNC FAILED] ${e.message}`);
     }
@@ -126,7 +146,10 @@ setInterval(updateRecoveryPrompt, config.automation.prompt_sync_interval_ms || 6
 
 // Sentinel Dashboard Server
 const server = http.createServer((req, res) => {
-    if (req.url === '/prompt') {
+    if (req.url === '/pulse') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(signalPulse));
+    } else if (req.url === '/prompt') {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(currentPrompt);
     } else {
@@ -136,23 +159,45 @@ const server = http.createServer((req, res) => {
                 <head>
                     <title>VGP SENTINEL | ${config.project_name}</title>
                     <style>
-                        body { background: #050508; color: #c5a059; font-family: 'Inter', sans-serif; padding: 2rem; }
-                        pre { background: rgba(255,255,255,0.03); padding: 1.5rem; border: 1px solid #c5a059; border-radius: 12px; white-space: pre-wrap; color: #fff; }
+                        body { background: #050508; color: #c5a059; font-family: 'Inter', sans-serif; padding: 2rem; margin: 0; }
+                        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; }
+                        pre { background: rgba(255,255,255,0.03); padding: 1.5rem; border: 1px solid #c5a059; border-radius: 12px; white-space: pre-wrap; color: #fff; font-size: 0.9rem; }
                         h1 { color: #fff; border-bottom: 2px solid #c5a059; padding-bottom: 0.5rem; letter-spacing: 1px; }
                         .status-box { background: rgba(46, 204, 113, 0.1); border-left: 4px solid #2ecc71; padding: 1rem; margin-bottom: 2rem; }
+                        .pulse-sidebar { background: rgba(255,255,255,0.02); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 12px; padding: 1rem; height: 80vh; overflow-y: auto; }
+                        .signal { font-size: 0.8rem; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+                        .signal-type { font-weight: bold; color: #fff; display: block; }
+                        .signal-time { color: rgba(255,255,255,0.4); font-size: 0.7rem; }
+                        .signal-details { color: #3498db; }
                     </style>
+                    <meta http-equiv="refresh" content="30">
                 </head>
                 <body>
-                    <h1>VGP SENTINEL DASHBOARD</h1>
-                    <div class="status-box">
-                        <strong>PROJECT:</strong> ${config.project_name} [${config.version}]<br>
-                        <strong>ROOT:</strong> ${ROOT_DIR}<br>
-                        <strong>STATUS:</strong> OPERATIONAL<br>
-                        <strong>LAST SYNC:</strong> ${lastReportUpdate.toISOString()}
+                    <h1>VGP SENTINEL DASHBOARD v1.3.0</h1>
+                    <div class="container">
+                        <div class="main-content">
+                            <div class="status-box">
+                                <strong>PROJECT:</strong> ${config.project_name} [${config.version}]<br>
+                                <strong>ROOT:</strong> ${ROOT_DIR}<br>
+                                <strong>STATUS:</strong> OPERATIONAL (VGP Pulse Active)<br>
+                                <strong>LAST SYNC:</strong> ${lastReportUpdate.toISOString()}
+                            </div>
+                            <h2>ACTIVE RECOVERY PROMPT</h2>
+                            <pre>${currentPrompt}</pre>
+                            <p><a href="/prompt" style="color:#3498db">Download Plaintext</a> | <a href="/pulse" style="color:#3498db">JSON Signal Feed</a></p>
+                        </div>
+                        <div class="pulse-sidebar">
+                            <h2>VGP PULSE</h2>
+                            ${signalPulse.map(s => `
+                                <div class="signal">
+                                    <span class="signal-time">${s.timestamp}</span>
+                                    <span class="signal-type">${s.type}</span>
+                                    <span class="signal-details">${s.details}</span>
+                                </div>
+                            `).join('')}
+                            ${signalPulse.length === 0 ? '<p style="color:rgba(255,255,255,0.2)">Waiting for system signals...</p>' : ''}
+                        </div>
                     </div>
-                    <h2>ACTIVE RECOVERY PROMPT</h2>
-                    <pre>${currentPrompt}</pre>
-                    <p><a href="/prompt" style="color:#3498db">Download Plaintext</a></p>
                 </body>
             </html>
         `);
@@ -160,5 +205,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`VGP SENTINEL STANDING BY ON PORT ${PORT} FOR ${config.project_name}`);
+    console.log(`VGP SENTINEL v1.3.0 STANDING BY ON PORT ${PORT} FOR ${config.project_name}`);
 });

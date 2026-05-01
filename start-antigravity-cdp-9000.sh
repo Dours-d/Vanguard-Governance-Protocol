@@ -23,7 +23,7 @@ ports.forEach(port => {
 # 3. Start VGP Sentinel (Vanguard Governance Protocol) if config exists
 if [ -f "./vgp.config.json" ]; then
     echo "VGP.CONFIG.JSON DETECTED. STARTING SENTINEL..."
-    nohup node "/home/abd/Desktop/vgp_sentinel.js" "$(pwd)" >/dev/null 2>&1 &
+    nohup node "/home/abd/Import/GitHub/Vanguard-Governance-Protocol/vgp_sentinel.js" "$(pwd)" >/dev/null 2>&1 &
     echo "VGP SENTINEL INITIALIZED FOR $(basename "$(pwd)")."
 else
     echo "NO VGP.CONFIG.JSON FOUND. SKIPPING GOVERNANCE MONITOR."
