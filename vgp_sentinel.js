@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-// VGP SENTINEL - UNIVERSAL CORE v1.5.0 (Logical Governance Edition)
+// VGP SENTINEL - UNIVERSAL CORE v1.5.2 (Evolutionary Governance Edition)
 // Node v12 Compatible
 // Usage: node vgp_sentinel.js [PROJECT_ROOT_PATH]
 
@@ -261,7 +261,7 @@ const server = http.createServer((req, res) => {
                     <meta http-equiv="refresh" content="30">
                 </head>
                 <body>
-                    <h1>VGP SENTINEL DASHBOARD v1.5.0</h1>
+                    <h1>VGP SENTINEL DASHBOARD v1.5.2</h1>
                     <div class="container">
                         <div class="main-content">
                             <div class="status-box">
@@ -332,5 +332,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`VGP SENTINEL v1.3.0 STANDING BY ON PORT ${PORT} FOR ${config.project_name}`);
+    console.log(`VGP SENTINEL v1.5.2 STANDING BY ON PORT ${PORT} FOR ${config.project_name}`);
 });

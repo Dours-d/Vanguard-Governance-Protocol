@@ -59,16 +59,19 @@ On the Infomaniak VPS, a master `vgp_nexus` service can monitor all active proje
 The VGP Sentinel will evolve from a text-based auditor into a high-fidelity governance dashboard:
 
 ### 🎨 Visual Enrichment
+
 - **Architectural Heatmaps**: A visual folder tree highlighting "Production Hotspots" vs. "Research Zones."
 - **Ethos Analytics**: Real-time charts showing the distribution of Artifacts across Paradigms (e.g., Vanguard vs. Jailed ratio).
 - **Mockup Previewer**: An integrated viewer to verify garment assemblage logic directly from the Sentinel dashboard.
 
 ### 🧠 Logic Enrichment (v1.5.0 - ACHIEVED)
+
 - **Agent Logic Stream**: Implemented real-time logging of user prompts and agent thoughts.
 - **Code-to-Text Audit**: Developed the measurement logic for architectural drift and discarded code.
 - **Recursive Mandate Synthesis**: Codified the project mandate as a living, evolutionary synthesis.
 
 ### 🛰️ The "VGP Pulse" (v1.5.0 - ACHIEVED)
+
 - **FS-Signals Broadcaster**: Integrated `fs.watch` for real-time architectural event tracking.
 - **Automated Cache Purge**: Wired FS-events to the Cloudflare purge protocol for instant synchronization.
 
@@ -77,6 +80,7 @@ The VGP Sentinel will evolve from a text-based auditor into a high-fidelity gove
 ## 6. The "Fully Autonomous" Horizon
 
 A "Fully Autonomous Sentinel" operates in a **Detection → Analysis → Proposal** loop:
+
 - **Detection**: The Sentinel identifies an unjustified directory.
 - **Analysis**: The Governance Agent analyzes the folder contents.
 - **Proposal**: The Agent automatically generates a one-click CLI command to either `PURGE` the folder or `AUTHORIZE` it in `.vgpignore`.
@@ -93,4 +97,4 @@ A "Fully Autonomous Sentinel" operates in a **Detection → Analysis → Proposa
 
 ---
 
-**VGP STATUS: v1.5.1-STABLE**
+## VGP STATUS: v1.5.1-STABLE
